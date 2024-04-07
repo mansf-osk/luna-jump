@@ -1,26 +1,48 @@
+#include <iostream>
 #include <SFML/Graphics.hpp>
 
 using namespace sf;
 
+
+const unsigned int windowSizeX = 800;
+const unsigned int windowSizeY = 400;
+const unsigned int groundLevel = windowSizeY - 20;
 int main()
 {
-	RenderWindow window(VideoMode(200, 200), "SFML!");
-	window.setFramerateLimit(60);
+	RenderWindow window(VideoMode(windowSizeX, windowSizeY), "Luna Jump");
+	window.setVerticalSyncEnabled(true);
 
-	CircleShape shape(100.f);
-	shape.setFillColor(Color::Green);
+	Texture luna;
+	// This is a 512x512 image.
+	if (!luna.loadFromFile("../Assets/Luna.png"))
+	{
+		std::cerr << "Error loading texture 'Luna.png'";
+	}
+	luna.setSmooth(true);
 
+	Sprite player;
+	player.setTexture(luna);
+	// Origin for transformations is bottom left corner of sprite.
+	player.setOrigin(Vector2f(0, 512));
+	player.setScale(Vector2f(0.2f, 0.2f));
+	player.setPosition(Vector2f(50, groundLevel));
+
+	// Game loop
 	while (window.isOpen())
 	{
 		Event event;
 		while (window.pollEvent(event))
 		{
-			if (event.type == Event::Closed)
-				window.close();
+			switch (event.type)
+			{
+				case Event::Closed:
+					window.close();
+					break;
+			}
 		}
 
-		window.clear();
-		window.draw(shape);
+		window.clear(Color::White);
+		window.draw(player);
 		window.display();
 	}
 
