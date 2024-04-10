@@ -1,14 +1,15 @@
+#include <random>
+#include <ctime>
 #include <iostream>
 #include "Lilo.h"
 
 using namespace sf;
 
-Lilo::Lilo(float initX, float initY, int initSpeed)
+Lilo::Lilo(float initX, float initY, int startSpeed)
 	:tex1(), tex2(), tex3(), sprites()
 {
 	x = initX;
 	y = initY;
-	speed = initSpeed;
 
 	if (!tex1.loadFromFile("../Assets/Lilo1.png"))
 	{
@@ -22,35 +23,47 @@ Lilo::Lilo(float initX, float initY, int initSpeed)
 	{
 		std::cerr << "Error loading texture 'Lilo3.png'";
 	}
-
+	
 	sprites[0] = Sprite(tex1);
 	sprites[1] = Sprite(tex2);
 	sprites[2] = Sprite(tex3);
 
 	for (Sprite& sprite : sprites)
 	{
+		FloatRect bounds = sprite.getGlobalBounds();
 		sprite.setScale(Vector2f(0.2f, 0.2f));
+		sprite.setOrigin(Vector2f(0, bounds.height));
 		sprite.setPosition(Vector2f(x, y));
 	}
+
+	randomizeSprite();
 }
 
 Lilo::~Lilo()
 {
 }
 
-void Lilo::move(const int entrypoint)
+void Lilo::move(const int entrypoint, int& gameSpeed)
 {
 	if (x <= -100)
 	{
+		randomizeSprite();
 		x = entrypoint;
+		gameSpeed += 1;
 	}
 	else
 	{
-		x -= speed;
+		x -= gameSpeed;
 	}
 }
 
 void Lilo::reset(const int entrypoint)
 {
 	x = entrypoint;
+}
+
+void Lilo::randomizeSprite()
+{
+	srand(time(NULL));
+	index = (rand() % 3);
 }

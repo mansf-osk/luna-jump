@@ -4,7 +4,7 @@
 using namespace sf;
 
 Luna::Luna(float initX, float initY)
-	:idle(), jump1(), jump2(), jump3(), jump4(), cursed(), sprites()
+	:idle(), jump1(), jump2(), jump3(), jump4(), cursed(), angry(), sprites()
 {
 	x = initX;
 	y = initY;
@@ -33,16 +33,23 @@ Luna::Luna(float initX, float initY)
 	{
 		std::cerr << "Error loading texture 'Luna_Cursed.png'";
 	}
+	if (!angry.loadFromFile("../Assets/Luna_Angry.png"))
+	{
+		std::cerr << "Error loading texture 'Luna_Angry.png'";
+	}
 	sprites[0] = Sprite(idle);
 	sprites[1] = Sprite(jump1);
 	sprites[2] = Sprite(jump2);
 	sprites[3] = Sprite(jump3);
 	sprites[4] = Sprite(jump4);
 	sprites[5] = Sprite(cursed);
+	sprites[6] = Sprite(angry);
 
 	for (Sprite& sprite : sprites)
 	{
+		FloatRect bounds = sprite.getGlobalBounds();
 		sprite.setScale(Vector2f(0.2f, 0.2f));
+		sprite.setOrigin(Vector2f(0, bounds.height));
 		sprite.setPosition(Vector2f(x, y));
 	}
 }
@@ -51,7 +58,7 @@ Luna::~Luna()
 {
 }
 
-void Luna::jump(const int groundLevel, const int jumpHeight, const int jumpSpeed)
+void Luna::jump(int groundLevel, const int jumpHeight, const int jumpSpeed)
 {
 	if (Keyboard::isKeyPressed(Keyboard::Space))
 			{
@@ -104,7 +111,7 @@ void Luna::jump(const int groundLevel, const int jumpHeight, const int jumpSpeed
 
 }
 
-void Luna::reset(const int groundLevel)
+void Luna::reset(int groundLevel)
 {
 	index = 0;
 	y = groundLevel;

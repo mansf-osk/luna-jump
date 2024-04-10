@@ -1,7 +1,8 @@
 #pragma once
-#include<SFML/Graphics.hpp>
-#include<../MyGame/Lilo.h>
-#include<../MyGame/Luna.h>
+#include <SFML/Graphics.hpp>
+#include <../MyGame/Lilo.h>
+#include <../MyGame/Luna.h>
+#include <../MyGame/Background.h>
 
 using namespace sf;
 
@@ -13,6 +14,11 @@ public:
 	Font font2;
 	Text text;
 	Text instructions;
+	Text scoreText;
+	int speed = 10;
+	int score = 0;
+	int highscore = 0;
+	bool isHighscore = false;
 
 	Game();
 	~Game();
@@ -20,6 +26,9 @@ public:
 	void setStartScreen();
 	void setRunning();
 	void setGameOver();
-	void render(RenderWindow& window, Lilo& lilo, Luna& luna) const;
+	void render(RenderWindow& window, Background& bg, Lilo& lilo, Luna& luna);
+
+private:
+	void updateScore();
 };
 

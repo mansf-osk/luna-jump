@@ -14,12 +14,14 @@ public:
 	float x = 0.f;
 	float y = 0.f;
 	FloatRect bounds;
-	int speed = 0;
 
-	Lilo(float initX, float initY, int initSpeed);
+	Lilo(float initX, float initY, int startSpeed);
 	~Lilo();
 
-	void move(const int entrypoint);
+	void move(const int entrypoint, int& gameSpeed);
 	void reset(const int entrypoint);
+
+private:
+	void randomizeSprite();
 };
 

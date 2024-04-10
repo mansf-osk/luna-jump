@@ -2,7 +2,7 @@
 #include "Game.h"
 
 Game::Game()
-	:font1(), font2(), text(), instructions()
+	:font1(), font2(), text(), instructions(), scoreText()
 {
 	if (!font1.loadFromFile("../Assets/Honk-Regular.ttf"))
 	{
@@ -20,6 +20,11 @@ Game::Game()
 	instructions.setFont(font2);
 	instructions.setFillColor(Color::Black);
 	instructions.setCharacterSize(16);
+
+	scoreText.setFont(font2);
+	scoreText.setFillColor(Color::Black);
+	scoreText.setCharacterSize(16);
+
 	setStartScreen();
 }
 
@@ -36,6 +41,9 @@ void Game::setStartScreen()
 
 void Game::setRunning()
 {
+	score = 0;
+	speed = 10;
+	isHighscore = false;
 	state = 1;
 }
 
@@ -46,7 +54,7 @@ void Game::setGameOver()
 	instructions.setString("Press R to try again");
 }
 
-void Game::render(RenderWindow& window, Lilo& lilo, Luna& luna) const
+void Game::render(RenderWindow& window, Background& bg, Lilo& lilo, Luna& luna)
 {
 	// Start Screen
 	if (state == 0)
@@ -57,15 +65,32 @@ void Game::render(RenderWindow& window, Lilo& lilo, Luna& luna) const
 	// Game running
 	if (state == 1)
 	{
+		updateScore();
+		window.draw(bg.sprite);
 		window.draw(lilo.sprites[lilo.index]);
 		window.draw(luna.sprites[luna.index]);
+		window.draw(scoreText);
 	}
 	// Game over
 	if (state == 2)
 	{
+		updateScore();
+		window.draw(bg.sprite);
 		window.draw(lilo.sprites[lilo.index]);
 		window.draw(luna.sprites[luna.index]);
 		window.draw(text);
 		window.draw(instructions);
+		window.draw(scoreText);
 	}
+}
+
+void Game::updateScore()
+{
+	// Initial speed is 10, so we substract that to start with score 0
+	score = speed - 10;
+	if (score > highscore)
+	{
+		isHighscore = true;
+	}
+	scoreText.setString(("Score: " + std::to_string(score) + " Highscore: " + std::to_string(highscore)));
 }

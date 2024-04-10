@@ -12,8 +12,9 @@ public:
 	Texture jump3;
 	Texture jump4;
 	Texture cursed;
+	Texture angry;
 	int index = 0;
-	Sprite sprites[6];
+	Sprite sprites[7];
 	float x = 0.f;
 	float y = 0.f;
 	FloatRect bounds;

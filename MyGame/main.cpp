@@ -2,15 +2,16 @@
 #include <SFML/Graphics.hpp>
 #include <Luna.h>
 #include <Lilo.h>
+#include <Background.h>
 #include <Game.h>
 
 using namespace sf;
 
 const unsigned int windowSizeX = 1200;
 const unsigned int windowSizeY = 400;
-const unsigned int groundLevel = windowSizeY - 150;
+const unsigned int groundLevel = windowSizeY - 50;
 const unsigned int playerPos = windowSizeX / 8;
-const unsigned int jumpSpeed = 8;
+const unsigned int jumpSpeed = 10;
 const unsigned int jumpHeight = groundLevel - 200;
 
 static void positionTextCenter(Text& text, float offsetY)
@@ -26,13 +27,14 @@ int main()
 	RenderWindow window(VideoMode(windowSizeX, windowSizeY), "Luna Jump");
 	window.setVerticalSyncEnabled(true);
 
-	int gameState = 1; // 0: menu, 1: running, 2: game over
-
 	// Initialize Luna (player)
 	Luna luna(playerPos, groundLevel);
 
 	// Initialize Lilo (obstacle)
 	Lilo lilo(windowSizeX, groundLevel, 10);
+
+	// Initialize moving background
+	Background bg;
 
 	// Initialize game object
 	Game game;
@@ -77,12 +79,26 @@ int main()
 			// Check for jump input and perform jumps
 			luna.jump(groundLevel, jumpHeight, jumpSpeed);
 			// Move obstacles
-			lilo.move(windowSizeX);
+			lilo.move(windowSizeX, game.speed);
+			// Move background
+			bg.move(game.speed, windowSizeX, windowSizeY);
+
+			if (game.isHighscore)
+			{
+				game.highscore = game.score;
+			}
 		}
 		// ---------- Gamestate 2: Game over ----------
 		if (game.state == 2)
 		{
-			luna.index = 5; // Load game over texture
+			if (game.isHighscore)
+			{
+				luna.index = 6;	// Load highscore texture
+			}
+			else
+			{
+				luna.index = 5; // Load game over texture
+			}
 			if (Keyboard::isKeyPressed(Keyboard::R))
 			{
 				lilo.reset(windowSizeX);
@@ -97,22 +113,10 @@ int main()
 		lilo.sprites[lilo.index].setPosition(Vector2f(lilo.x, lilo.y));
 		positionTextCenter(game.text, 0.f);
 		positionTextCenter(game.instructions, windowSizeY/8.f);
+		positionTextCenter(game.scoreText, - (windowSizeY / 3.f));
 
 		window.clear(Color::White);
-		game.render(window, lilo, luna);
-		// Drawing collision boxes for debugging
-		/*
-		RectangleShape lunaRect(Vector2f(lunaBox.width, lunaBox.height));
-		lunaRect.setFillColor(Color::Blue);
-		lunaRect.setPosition(lunaBox.left, lunaBox.top);
-		RectangleShape liloRect(Vector2f(liloBox.width, liloBox.height));
-		liloRect.setFillColor(Color::Blue);
-		liloRect.setPosition(liloBox.left, liloBox.top);
-
-		window.draw(lunaRect);
-		window.draw(liloRect);
-		*/
-		// End debug
+		game.render(window, bg, lilo, luna);
 		window.display();
 	}
 
