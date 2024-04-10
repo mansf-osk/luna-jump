@@ -3,9 +3,12 @@
 
 using namespace sf;
 
-Luna::Luna()
+Luna::Luna(float initX, float initY)
 	:idle(), jump1(), jump2(), jump3(), jump4(), cursed(), sprites()
 {
+	x = initX;
+	y = initY;
+
 	if (!idle.loadFromFile("../Assets/Luna.png"))
 	{
 		std::cerr << "Error loading texture 'Luna.png'";
@@ -40,6 +43,7 @@ Luna::Luna()
 	for (Sprite& sprite : sprites)
 	{
 		sprite.setScale(Vector2f(0.2f, 0.2f));
+		sprite.setPosition(Vector2f(x, y));
 	}
 }
 
@@ -98,4 +102,13 @@ void Luna::jump(const int groundLevel, const int jumpHeight, const int jumpSpeed
 				isDescending = true;
 			}
 
+}
+
+void Luna::reset(const int groundLevel)
+{
+	index = 0;
+	y = groundLevel;
+	hasLanded = true;
+	isAscending = false;
+	isDescending = false;
 }

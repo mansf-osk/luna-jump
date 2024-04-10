@@ -16,15 +16,15 @@ public:
 	Sprite sprites[6];
 	float x = 0.f;
 	float y = 0.f;
-	FloatRect box;
+	FloatRect bounds;
 	bool isAscending = false;
 	bool isDescending = false;
 	bool hasLanded = true;
 	
-	Luna();
+	Luna(float initX, float initY);
 	~Luna();
 
 	void jump(const int groundLevel, const int jumpHeight, const int jumpSpeed);
-
+	void reset(const int groundLevel);
 };
 

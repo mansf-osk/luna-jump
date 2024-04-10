@@ -1,21 +1,25 @@
 #include <iostream>
 #include <SFML/Graphics.hpp>
 #include <Luna.h>
+#include <Lilo.h>
+#include <Game.h>
 
 using namespace sf;
 
-
-const unsigned int windowSizeX = 800;
+const unsigned int windowSizeX = 1200;
 const unsigned int windowSizeY = 400;
 const unsigned int groundLevel = windowSizeY - 150;
-const int jumpSpeed = 8;
-const int jumpHeight = groundLevel - 200;
+const unsigned int playerPos = windowSizeX / 8;
+const unsigned int jumpSpeed = 8;
+const unsigned int jumpHeight = groundLevel - 200;
 
-struct Position
+static void positionTextCenter(Text& text, float offsetY)
 {
-	int x;
-	int y;
-};
+	FloatRect textRect = text.getLocalBounds();
+	text.setOrigin(textRect.left + textRect.width / 2.f,
+		textRect.top + textRect.height / 2.f);
+	text.setPosition(Vector2f(windowSizeX / 2.f, windowSizeY / 2.f + offsetY));
+}
 
 int main()
 {
@@ -24,49 +28,14 @@ int main()
 
 	int gameState = 1; // 0: menu, 1: running, 2: game over
 
-	// ---------- Luna (player) setup ----------
-	Luna luna;
-	luna.x = 60;
-	luna.y = groundLevel;
+	// Initialize Luna (player)
+	Luna luna(playerPos, groundLevel);
 
-	// ---------- Lilo (obstacle) setup ----------
-		// Lilo (obstacle) textures
-	Texture lilo1;
-	Texture lilo2;
-	Texture lilo3;
-	if (!lilo1.loadFromFile("../Assets/Lilo1.png"))
-	{
-		std::cerr << "Error loading texture 'Lilo1.png'";
-	}
-	if (!lilo2.loadFromFile("../Assets/Lilo2.png"))
-	{
-		std::cerr << "Error loading texture 'Lilo2.png'";
-	}
-	if (!lilo3.loadFromFile("../Assets/Lilo3.png"))
-	{
-		std::cerr << "Error loading texture 'Lilo3.png'";
-	}
+	// Initialize Lilo (obstacle)
+	Lilo lilo(windowSizeX, groundLevel, 10);
 
-	// Lilo (obstacle) sprites
-	int liloIndex = 0;
-	Sprite liloSprites[3];
-	liloSprites[0] = Sprite(lilo1);
-	liloSprites[1] = Sprite(lilo2);
-	liloSprites[2] = Sprite(lilo3);
-
-	// Default values for liloSprites
-	FloatRect liloBox = liloSprites[liloIndex].getGlobalBounds();
-	Position liloPosition;
-	liloPosition.x = windowSizeX;
-	liloPosition.y = groundLevel;
-
-	for (Sprite& sprite : liloSprites)
-	{
-		sprite.setScale(Vector2f(0.2f, 0.2f));
-		sprite.setPosition(Vector2f(liloPosition.x, liloPosition.y));
-	}
-
-	int liloSpeed = 10;
+	// Initialize game object
+	Game game;
 
 	// Game loop
 	while (window.isOpen())
@@ -82,58 +51,55 @@ int main()
 			}
 		}
 
-		// ---------- Logic ----------
-
 		// Get object bounds for the current frame
-		luna.box = luna.sprites[luna.index].getGlobalBounds();
-		luna.box.width -= 15.f; luna.box.height -= 15.f; 
-		liloBox = liloSprites[liloIndex].getGlobalBounds();
-		liloBox.width -= 10.f;
+		// Bounds get reduced to make for better hitboxes
+		luna.bounds = luna.sprites[luna.index].getGlobalBounds();
+		luna.bounds.width -= 15.f; luna.bounds.height -= 15.f; 
+		lilo.bounds = lilo.sprites[lilo.index].getGlobalBounds();
+		lilo.bounds.width -= 10.f;
 
-		if (gameState == 1) // Game is running
+		// ---------- Gamestate 0: Start screen ----------
+		if (game.state == 0)
 		{
-			if (luna.box.intersects(liloBox))
+			if (Keyboard::isKeyPressed(Keyboard::Enter))
 			{
-				gameState = 2; // Game over
-			}
-
-			// ---------- Jumping ----------
-			luna.jump(groundLevel, jumpHeight, jumpSpeed);
-
-			// ---------- Lilo moving ----------
-			if (liloPosition.x <= -100)
-			{
-				liloPosition.x = windowSizeX;
-			}
-			else
-			{
-				liloPosition.x -= liloSpeed;
+				game.setRunning();
 			}
 		}
-		if (gameState == 2) // Game over
+		// ---------- Gamestate 1: Game is running ----------
+		if (game.state == 1)
 		{
-			luna.index = 5; // Dead
+			if (luna.bounds.intersects(lilo.bounds))
+			{
+				game.setGameOver();
+			}
+
+			// Check for jump input and perform jumps
+			luna.jump(groundLevel, jumpHeight, jumpSpeed);
+			// Move obstacles
+			lilo.move(windowSizeX);
+		}
+		// ---------- Gamestate 2: Game over ----------
+		if (game.state == 2)
+		{
+			luna.index = 5; // Load game over texture
 			if (Keyboard::isKeyPressed(Keyboard::R))
 			{
-				luna.index = 0;
-				luna.y = groundLevel;
+				lilo.reset(windowSizeX);
+				luna.reset(groundLevel);
 
-				liloIndex = 0;
-				liloPosition.x = windowSizeX;
-
-				luna.hasLanded = true;
-				luna.isAscending = false;
-				luna.isDescending = false;
-				gameState = 1; // Restart the game
+				game.setRunning();
 			}
 		}
+
 	// ---------- Drawing ----------
 		luna.sprites[luna.index].setPosition(Vector2f(luna.x, luna.y));
-		liloSprites[liloIndex].setPosition(liloPosition.x, liloPosition.y);
+		lilo.sprites[lilo.index].setPosition(Vector2f(lilo.x, lilo.y));
+		positionTextCenter(game.text, 0.f);
+		positionTextCenter(game.instructions, windowSizeY/8.f);
 
 		window.clear(Color::White);
-		window.draw(liloSprites[liloIndex]);
-		window.draw(luna.sprites[luna.index]);
+		game.render(window, lilo, luna);
 		// Drawing collision boxes for debugging
 		/*
 		RectangleShape lunaRect(Vector2f(lunaBox.width, lunaBox.height));
