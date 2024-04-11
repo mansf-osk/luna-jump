@@ -5,7 +5,7 @@
 
 using namespace sf;
 
-Lilo::Lilo(float initX, float initY, int startSpeed)
+Lilo::Lilo(float initX, float initY)
 	:tex1(), tex2(), tex3(), sprites()
 {
 	x = initX;

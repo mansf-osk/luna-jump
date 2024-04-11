@@ -16,7 +16,7 @@ Background::~Background()
 {
 }
 
-void Background::move(int& gameSpeed, const int& windowSizeX, const int& windowSizeY)
+void Background::move(int gameSpeed, const int windowSizeX, const int windowSizeY)
 {
 	if (offset >= tex.getSize().x - windowSizeX)
 	{

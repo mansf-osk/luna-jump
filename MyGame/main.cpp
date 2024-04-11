@@ -7,37 +7,23 @@
 
 using namespace sf;
 
-const unsigned int windowSizeX = 1200;
-const unsigned int windowSizeY = 400;
-const unsigned int groundLevel = windowSizeY - 50;
-const unsigned int playerPos = windowSizeX / 8;
-const unsigned int jumpSpeed = 10;
-const unsigned int jumpHeight = groundLevel - 200;
-
-static void positionTextCenter(Text& text, float offsetY)
-{
-	FloatRect textRect = text.getLocalBounds();
-	text.setOrigin(textRect.left + textRect.width / 2.f,
-		textRect.top + textRect.height / 2.f);
-	text.setPosition(Vector2f(windowSizeX / 2.f, windowSizeY / 2.f + offsetY));
-}
-
 int main()
 {
-	RenderWindow window(VideoMode(windowSizeX, windowSizeY), "Luna Jump");
+	// Initialize game object
+	Game game;
+
+	// Initialize game window
+	RenderWindow window(VideoMode(game.windowSizeX, game.windowSizeY), "Luna Jump");
 	window.setVerticalSyncEnabled(true);
 
 	// Initialize Luna (player)
-	Luna luna(playerPos, groundLevel);
+	Luna luna(static_cast<float>(game.playerPos), static_cast<float>(game.groundLevel));
 
 	// Initialize Lilo (obstacle)
-	Lilo lilo(windowSizeX, groundLevel, 10);
+	Lilo lilo(static_cast<float>(game.windowSizeX), static_cast<float>(game.groundLevel));
 
 	// Initialize moving background
 	Background bg;
-
-	// Initialize game object
-	Game game;
 
 	// Game loop
 	while (window.isOpen())
@@ -45,80 +31,19 @@ int main()
 		Event event;
 		while (window.pollEvent(event))
 		{
-			switch (event.type)
+			if (event.type == Event::Closed)
 			{
-			case Event::Closed:
 				window.close();
-				break;
 			}
 		}
 
-		// Get object bounds for the current frame
-		// Bounds get reduced to make for better hitboxes
-		luna.bounds = luna.sprites[luna.index].getGlobalBounds();
-		luna.bounds.width -= 15.f; luna.bounds.height -= 15.f; 
-		lilo.bounds = lilo.sprites[lilo.index].getGlobalBounds();
-		lilo.bounds.width -= 10.f;
+		// Logic 
+		game.update(lilo, luna, bg);
 
-		// ---------- Gamestate 0: Start screen ----------
-		if (game.state == 0)
-		{
-			if (Keyboard::isKeyPressed(Keyboard::Enter))
-			{
-				game.setRunning();
-			}
-		}
-		// ---------- Gamestate 1: Game is running ----------
-		if (game.state == 1)
-		{
-			if (luna.bounds.intersects(lilo.bounds))
-			{
-				game.setGameOver();
-			}
-
-			// Check for jump input and perform jumps
-			luna.jump(groundLevel, jumpHeight, jumpSpeed);
-			// Move obstacles
-			lilo.move(windowSizeX, game.speed);
-			// Move background
-			bg.move(game.speed, windowSizeX, windowSizeY);
-
-			if (game.isHighscore)
-			{
-				game.highscore = game.score;
-			}
-		}
-		// ---------- Gamestate 2: Game over ----------
-		if (game.state == 2)
-		{
-			if (game.isHighscore)
-			{
-				luna.index = 6;	// Load highscore texture
-			}
-			else
-			{
-				luna.index = 5; // Load game over texture
-			}
-			if (Keyboard::isKeyPressed(Keyboard::R))
-			{
-				lilo.reset(windowSizeX);
-				luna.reset(groundLevel);
-
-				game.setRunning();
-			}
-		}
-
-	// ---------- Drawing ----------
-		luna.sprites[luna.index].setPosition(Vector2f(luna.x, luna.y));
-		lilo.sprites[lilo.index].setPosition(Vector2f(lilo.x, lilo.y));
-		positionTextCenter(game.text, 0.f);
-		positionTextCenter(game.instructions, windowSizeY/8.f);
-		positionTextCenter(game.scoreText, - (windowSizeY / 3.f));
-
+		// Drawing 
 		window.clear(Color::White);
 		game.render(window, bg, lilo, luna);
 		window.display();
 	}
-
 	return 0;
 }

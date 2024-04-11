@@ -13,6 +13,6 @@ public:
 	Background();
 	~Background();
 
-	void move(int& gameSpeed, const int& windowSizeX, const int& windowSizeY);
+	void move(int gameSpeed, const int windowSizeX, const int windowSizeY);
 };
 

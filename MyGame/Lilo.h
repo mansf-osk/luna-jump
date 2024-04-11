@@ -3,6 +3,7 @@
 
 using namespace sf;
 
+// Handles textures, sprites and logic for the obstacle. Also handles increases to the gamespeed/movespeed.
 class Lilo
 {
 public:
@@ -15,7 +16,7 @@ public:
 	float y = 0.f;
 	FloatRect bounds;
 
-	Lilo(float initX, float initY, int startSpeed);
+	Lilo(float initX, float initY);
 	~Lilo();
 
 	void move(const int entrypoint, int& gameSpeed);

@@ -3,6 +3,7 @@
 
 using namespace sf;
 
+// Handles textures, sprites and logic for the player character.
 class Luna
 {
 public:
