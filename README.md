@@ -1,3 +1,9 @@
+<p align="center">
+<img src="./Luna.gif" alt="picture of luna(the player character)" width="200" height="200" />
+<img src="./Luna.gif" alt="picture of luna(the player character)" width="200" height="200" />
+<img src="./Luna.gif" alt="picture of luna(the player character)" width="200" height="200" />
+</p>
+
 # Luna Jump
 *This game was written as a final project for the 'Programming in C++' course at HWR Berlin.*
 
