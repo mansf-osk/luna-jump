@@ -13,7 +13,7 @@ int main()
 	Game game;
 
 	// Initialize game window
-	RenderWindow window(VideoMode(game.windowSizeX, game.windowSizeY), "Luna Jump", sf::Style::Close);
+	RenderWindow window(VideoMode(game.windowSizeX, game.windowSizeY), "Luna Jump", Style::Close);
 	window.setVerticalSyncEnabled(true);
 
 	// Initialize Luna (player)
