@@ -31,3 +31,9 @@ https://opengameart.org/content/bevouliin-free-mountain-game-background-for-game
 
 SFML library:
 https://www.sfml-dev.org/
+
+Honk-Regular font:
+https://fonts.google.com/specimen/Honk
+
+Roboto-Regular font:
+https://fonts.google.com/specimen/Roboto
