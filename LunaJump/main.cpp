@@ -14,7 +14,7 @@ int main()
 
 	// Initialize game window
 	RenderWindow window(VideoMode(game.windowSizeX, game.windowSizeY), "Luna Jump", Style::Close);
-	window.setVerticalSyncEnabled(true);
+	window.setFramerateLimit(60);
 
 	// Initialize Luna (player)
 	Luna luna(static_cast<float>(game.playerPos), static_cast<float>(game.groundLevel));
